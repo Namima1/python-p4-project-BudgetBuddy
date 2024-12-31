@@ -3,156 +3,162 @@ import React, { useState, useEffect } from "react";
 function Dashboard() {
     const [expenses, setExpenses] = useState([]);
     const [newExpense, setNewExpense] = useState({ name: "", amount: "", category: "", date: "" });
-    const [error, setError] = useState("");
+    const [categories, setCategories] = useState(["Food", "Entertainment", "Subscriptions", "Miscellaneous", "Housing"]);
+    const [newCategory, setNewCategory] = useState(""); // For creating custom categories
+    const [editingExpense, setEditingExpense] = useState(null); // For tracking which expense is being edited
+    const [errorMessage, setErrorMessage] = useState(""); // State for validation messages
 
-    // Fetch expenses from the backend
     useEffect(() => {
-        const fetchExpenses = async () => {
-            try {
-                const username = localStorage.getItem("username");
-                const response = await fetch("http://127.0.0.1:5001/expenses", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Username": username,
-                    },
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setExpenses(data);
-                } else {
-                    const errorData = await response.json();
-                    setError(errorData.message || "Failed to fetch expenses.");
-                }
-            } catch (error) {
-                setError("An error occurred. Please try again.");
-            }
-        };
-
         fetchExpenses();
     }, []);
 
-    // Add new expense
-    const handleAddExpense = async (e) => {
-        e.preventDefault();
-        try {
-            const username = localStorage.getItem("username");
-            const expenseToAdd = { 
-                ...newExpense, 
-                amount: parseFloat(newExpense.amount),
-            };
+    function fetchExpenses() {
+        const username = localStorage.getItem("username"); // Get the logged-in user's username
+        fetch("http://127.0.0.1:5001/expenses", {
+            headers: { "Content-Type": "application/json", "Username": username }
+        })
+            .then((response) => response.json())
+            .then((data) => setExpenses(data))
+            .catch((error) => console.error("Failed to fetch expenses:", error));
+    }
 
-            const response = await fetch("http://127.0.0.1:5001/expenses", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Username": username,
-                },
-                body: JSON.stringify(expenseToAdd),
-            });
+    function handleAddOrUpdateExpense(event) {
+        event.preventDefault();
 
-            if (response.ok) {
-                const createdExpense = await response.json();
-                setExpenses([...expenses, createdExpense]);
-                setNewExpense({ name: "", amount: "", category: "", date: "" });
-            } else {
-                const errorData = await response.json();
-                setError(errorData.message || "Failed to add expense.");
-            }
-        } catch (error) {
-            setError("An error occurred while adding the expense.");
+        // Validation
+        if (!newExpense.name || !newExpense.amount || !newExpense.category || !newExpense.date) {
+            setErrorMessage("All fields are required!");
+            return;
         }
-    };
-
-    // Delete expense
-    const handleDeleteExpense = async (id) => {
-        try {
-            const username = localStorage.getItem("username");
-            const response = await fetch(`http://127.0.0.1:5001/expenses/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Username": username,
-                },
-            });
-
-            if (response.ok) {
-                setExpenses(expenses.filter((expense) => expense.id !== id));
-            } else {
-                setError("Failed to delete expense.");
-            }
-        } catch (error) {
-            setError("An error occurred while deleting the expense.");
+        if (newExpense.amount <= 0) {
+            setErrorMessage("Amount must be greater than 0!");
+            return;
         }
-    };
 
-    // Calculate summary
-    const totalExpenses = expenses.length;
-    const totalAmount = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+        setErrorMessage("");
+
+        const username = localStorage.getItem("username"); // Get the logged-in user's username
+        const url = editingExpense
+            ? `http://127.0.0.1:5001/expenses/${editingExpense.id}`
+            : "http://127.0.0.1:5001/expenses";
+        const method = editingExpense ? "PATCH" : "POST";
+
+        const expenseToSend = editingExpense || newExpense;
+
+        fetch(url, {
+            method: method,
+            headers: { "Content-Type": "application/json", "Username": username },
+            body: JSON.stringify(expenseToSend),
+        })
+            .then((response) => response.json())
+            .then(() => {
+                fetchExpenses(); // Refresh the expense list
+                setNewExpense({ name: "", amount: "", category: "", date: "" }); // Clear form
+                setEditingExpense(null); // Clear edit mode
+            })
+            .catch((error) => console.error("Failed to add/update expense:", error));
+    }
+
+    function handleDeleteExpense(expenseId) {
+        const username = localStorage.getItem("username"); // Get the logged-in user's username
+        fetch(`http://127.0.0.1:5001/expenses/${expenseId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json", "Username": username },
+        })
+            .then(() => fetchExpenses()) // Refresh the expense list
+            .catch((error) => console.error("Failed to delete expense:", error));
+    }
+
+    function handleCreateCategory() {
+        if (newCategory.trim() === "") {
+            alert("Category name cannot be empty!"); // Basic validation
+            return;
+        }
+        setCategories([...categories, newCategory]); // Add new category to the list
+        setNewCategory(""); // Clear the input
+    }
 
     return (
         <div>
             <h2>Welcome to Your Dashboard</h2>
-            {error && <p style={{ color: "red" }}>{error}</p>}
 
-            <div>
-                <h3>Summary</h3>
-                <p>Total Expenses: {totalExpenses}</p>
-                <p>Total Amount Spent: ${totalAmount.toFixed(2)}</p>
-            </div>
+            {/* Validation error message */}
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
-            <div>
-                <h3>Add New Expense</h3>
-                <form onSubmit={handleAddExpense}>
-                    <input
-                        type="text"
-                        placeholder="Name"
-                        value={newExpense.name}
-                        onChange={(e) => setNewExpense({ ...newExpense, name: e.target.value })}
-                        required
-                    />
-                    <input
-                        type="number"
-                        placeholder="Amount"
-                        value={newExpense.amount}
-                        onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
-                        required
-                    />
-                    <select
-                        value={newExpense.category}
-                        onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
-                        required
-                    >
-                        <option value="">Select Category</option>
-                        <option value="Food">Food</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Subscriptions">Subscriptions</option>
-                        <option value="Miscellaneous">Miscellaneous</option>
-                        <option value="Housing">Housing</option>
-                    </select>
-                    <input
-                        type="date"
-                        value={newExpense.date}
-                        onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
-                        required
-                    />
-                    <button type="submit">Add Expense</button>
-                </form>
-            </div>
-
-            <div>
-                <h3>Your Expenses</h3>
-                <ul>
-                    {expenses.map((expense) => (
-                        <li key={expense.id}>
-                            {expense.name} - ${expense.amount} ({expense.category}) on{' '}
-                            {new Date(expense.date).toLocaleDateString()}
-                            <button onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
-                        </li>
+            {/* Form for adding or updating an expense */}
+            <form onSubmit={handleAddOrUpdateExpense}>
+                <input
+                    type="text"
+                    placeholder="Expense Name"
+                    value={editingExpense ? editingExpense.name : newExpense.name}
+                    onChange={(e) =>
+                        editingExpense
+                            ? setEditingExpense({ ...editingExpense, name: e.target.value })
+                            : setNewExpense({ ...newExpense, name: e.target.value })
+                    }
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="Amount"
+                    value={editingExpense ? editingExpense.amount : newExpense.amount}
+                    onChange={(e) =>
+                        editingExpense
+                            ? setEditingExpense({ ...editingExpense, amount: e.target.value })
+                            : setNewExpense({ ...newExpense, amount: e.target.value })
+                    }
+                    required
+                />
+                <select
+                    value={editingExpense ? editingExpense.category : newExpense.category}
+                    onChange={(e) =>
+                        editingExpense
+                            ? setEditingExpense({ ...editingExpense, category: e.target.value })
+                            : setNewExpense({ ...newExpense, category: e.target.value })
+                    }
+                    required
+                >
+                    <option value="">Select Category</option>
+                    {categories.map((cat, index) => (
+                        <option key={index} value={cat}>
+                            {cat}
+                        </option>
                     ))}
-                </ul>
+                </select>
+                <input
+                    type="date"
+                    value={editingExpense ? editingExpense.date : newExpense.date}
+                    onChange={(e) =>
+                        editingExpense
+                            ? setEditingExpense({ ...editingExpense, date: e.target.value })
+                            : setNewExpense({ ...newExpense, date: e.target.value })
+                    }
+                    required
+                />
+                <button type="submit">{editingExpense ? "Update Expense" : "Add Expense"}</button>
+            </form>
+
+            {/* Form for creating a new category */}
+            <div>
+                <input
+                    type="text"
+                    placeholder="New Category"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                />
+                <button onClick={handleCreateCategory}>Add Category</button>
             </div>
+
+            {/* List of expenses */}
+            <ul>
+                {expenses.map((expense) => (
+                    <li key={expense.id}>
+                        {expense.name} - ${expense.amount} ({expense.category}) on {expense.date}
+                        <button onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
+                        <button onClick={() => setEditingExpense(expense)}>Update</button>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }

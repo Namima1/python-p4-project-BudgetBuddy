@@ -10,15 +10,15 @@ function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        console.log('Attempting login with:', { username, password }); // Debugging
     
         try {
-            const response = await login(username, password);
+            const response = await login(username, password); // API call
             console.log('API Response:', response); // Debugging
             if (response.message === 'Login successful!') {
                 setMessage('Login successful!');
-                localStorage.setItem('username', username); // Save username in localStorage
-                console.log('Navigating to dashboard...'); // Debugging
-                navigate('/dashboard'); // Redirect to the Dashboard page
+                localStorage.setItem('username', username);
+                navigate('/dashboard');
             } else {
                 setMessage(response.message || 'Login failed!');
             }
@@ -26,7 +26,7 @@ function Login() {
             setMessage('An error occurred. Please try again.');
             console.error('Login error:', error);
         }
-    };    
+    };        
 
     return (
         <div>
