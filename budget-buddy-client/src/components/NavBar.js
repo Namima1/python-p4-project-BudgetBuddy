@@ -4,13 +4,12 @@ import '../styles/NavBar.css';
 
 function NavBar() {
     const navigate = useNavigate();
-    const email = localStorage.getItem('email');
+    const username = localStorage.getItem('username'); // Use username instead of email
 
     const handleLogout = () => {
-        localStorage.removeItem('email');  // Change to email
-        navigate('/login'); 
+        localStorage.removeItem('username');  // Clear username from localStorage
+        navigate('/login'); // Redirect to login page
     };
-    
 
     return (
         <nav className="navbar">
@@ -19,7 +18,7 @@ function NavBar() {
                 <li>
                     <NavLink to="/" className="nav-link">Home</NavLink>
                 </li>
-                {email ? (
+                {username ? (
                     <>
                         <li>
                             <NavLink to="/dashboard" className="nav-link">Dashboard</NavLink>
