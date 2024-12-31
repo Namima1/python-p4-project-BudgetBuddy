@@ -9,7 +9,7 @@ export async function login(username, password) {
         body: JSON.stringify({ username, password }),
     });
 
-    return response.json();
+    return response
 }
 
 export async function register(username, password) {
