@@ -40,8 +40,7 @@ def login():
 
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
-        return jsonify({"message": "Login successful"}), 200
-
+        return jsonify({"message": "Login successful!"}), 200
     return jsonify({"message": "Invalid username or password"}), 401
 
 @app.route("/expenses", methods=["GET", "POST"])
@@ -57,19 +56,16 @@ def expenses():
 
     if request.method == "GET":
         expenses = Expense.query.filter_by(user_id=user.id).all()
-        return jsonify(
-            [
-                {
-                    "id": exp.id,
-                    "name": exp.name,
-                    "amount": exp.amount,
-                    "category": exp.category,
-                    "date": exp.date.isoformat(),
-                    "user_id": exp.user_id,
-                }
-                for exp in expenses
-            ]
-        ), 200
+        return jsonify([
+            {
+                "id": exp.id,
+                "name": exp.name,
+                "amount": exp.amount,
+                "category": exp.category,
+                "date": exp.date.isoformat(),
+            }
+            for exp in expenses
+        ]), 200
 
     if request.method == "POST":
         data = request.get_json()
@@ -81,24 +77,59 @@ def expenses():
                 name=data.get("name"),
                 amount=float(data.get("amount")),
                 category=data.get("category"),
-                date=date_object,  # Use the date object here
+                date=date_object,
                 user_id=user.id,
             )
             db.session.add(expense)
             db.session.commit()
-            return jsonify(
-                {
-                    "id": expense.id,
-                    "name": expense.name,
-                    "amount": expense.amount,
-                    "category": expense.category,
-                    "date": expense.date.isoformat(),  # Return ISO format for consistency
-                    "user_id": expense.user_id,
-                }
-            ), 201
+            return jsonify({
+                "id": expense.id,
+                "name": expense.name,
+                "amount": expense.amount,
+                "category": expense.category,
+                "date": expense.date.isoformat(),
+            }), 201
         except Exception as e:
             print(f"Error while creating expense: {e}")
             return jsonify({"message": "Failed to create expense"}), 500
+
+@app.route("/expenses/<int:expense_id>", methods=["DELETE", "PATCH"])
+def manage_expense(expense_id):
+    username = request.headers.get("Username")
+    if not username:
+        return jsonify({"message": "Unauthorized"}), 401
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    expense = Expense.query.get(expense_id)
+    if not expense or expense.user_id != user.id:
+        return jsonify({"message": "Expense not found"}), 404
+
+    if request.method == "DELETE":
+        db.session.delete(expense)
+        db.session.commit()
+        return jsonify({"message": "Expense deleted successfully"}), 200
+
+    if request.method == "PATCH":
+        data = request.get_json()
+        if "name" in data:
+            expense.name = data["name"]
+        if "amount" in data:
+            expense.amount = float(data["amount"])
+        if "category" in data:
+            expense.category = data["category"]
+        if "date" in data:
+            expense.date = datetime.strptime(data["date"], "%Y-%m-%d").date()
+        db.session.commit()
+        return jsonify({
+            "id": expense.id,
+            "name": expense.name,
+            "amount": expense.amount,
+            "category": expense.category,
+            "date": expense.date.isoformat(),
+        }), 200
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
