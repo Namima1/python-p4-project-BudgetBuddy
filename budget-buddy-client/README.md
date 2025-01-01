@@ -128,6 +128,6 @@ Ensure you have the following installed:
 ---
 
 ## Contributors
-- Karina 
-- Namima
+- Namima 
 - Ron
+- Karina
