@@ -193,17 +193,31 @@ function Dashboard() {
 
             {/* List of Expenses */}
             <h3>Your Expenses</h3>
-            <ul>
-                {expenses.map((expense) => (
-                    <li key={expense.id}>
-                        {expense.name} - ${expense.amount} ({expense.category}) on {expense.date}
-                        <button onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
-                        <button onClick={() => setEditingExpense(expense)}>Update</button>
-                    </li>
-                ))}
-            </ul>
+<div className="expense-table">
+    {/* Table Header */}
+    <div className="expense-table-header">
+        <div className="expense-column">Name</div>
+        <div className="expense-column">Category</div>
+        <div className="expense-column">Amount</div>
+        <div className="expense-column">Date</div>
+        <div className="expense-column">Actions</div>
+    </div>
+
+    {/* Table Rows */}
+    {expenses.map((expense) => (
+        <div key={expense.id} className="expense-row">
+            <div className="expense-cell">{expense.name}</div>
+            <div className="expense-cell">{expense.category}</div>
+            <div className="expense-cell">${parseFloat(expense.amount).toFixed(2)}</div>
+            <div className="expense-cell">{new Date(expense.date).toLocaleDateString()}</div>
+            <div className="expense-cell expense-actions">
+                <button onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
+                <button onClick={() => setEditingExpense(expense)}>Update</button>
+            </div>
         </div>
-    );
-}
+    ))}
+</div>
+</div>
+);}
 
 export default Dashboard;

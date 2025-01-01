@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import ExpenseList from "./components/ExpenseList";
+import './index.css';
 
 function App() {
   return (
@@ -14,10 +15,15 @@ function App() {
         <Route
           path="/"
           element={
-            <div>
-              <h1>Budget Buddy</h1>
-              <p>
-              Budget Buddy is a dynamic and user-friendly personal finance tracker that allows users to seamlessly add expenses, monitor their spending habits, and customize interactive dashboards for better financial insights.              </p>
+            <div className="home-container">
+              <h1 className="home-title">Welcome to Budget Buddy</h1>
+              <div className="home-description">
+                <p>
+                  Budget Buddy is a dynamic and user-friendly personal finance tracker 
+                  that allows users to seamlessly add expenses, monitor their spending habits, 
+                  and customize interactive dashboards for better financial insights.
+                </p>
+              </div>
             </div>
           }
         />

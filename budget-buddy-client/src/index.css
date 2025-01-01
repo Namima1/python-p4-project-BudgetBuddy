@@ -1,0 +1,123 @@
+/* Home Page Styling */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh; 
+    padding: 20px;
+    background-color: #eef2f5; 
+}
+
+.home-title {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.home-description {
+    max-width: 800px; 
+    margin: 0 auto;
+    text-align: center; 
+    line-height: 2.6; 
+    font-size: 20px;
+    padding: 20px;
+    background-color: #f9f9f9; 
+    border-radius: 15px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+}
+
+.expense-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Create 4 equal columns */
+    gap: 20px; /* Add spacing between items */
+    margin-top: 20px;
+}
+
+.expense-card {
+    background-color: #ffffff; /* White background for each card */
+    border: 1px solid #ddd; /* Light border for the card */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px; /* Inner spacing */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    text-align: center; /* Center-align text */
+}
+
+.expense-card p {
+    margin: 5px 0; /* Small spacing between rows in the card */
+    font-size: 14px; /* Smaller text size */
+}
+
+.expense-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.expense-actions button {
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #ff6f61;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.expense-actions button:hover {
+    background-color: #ff3b30;
+}
+
+/* Expense Table Styling */
+.expense-table {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 equal columns */
+    gap: 10px; /* Spacing between rows */
+    margin-top: 20px;
+}
+
+.expense-table-header {
+    display: contents; /* Ensure the header uses the same grid as rows */
+    font-weight: bold;
+    background-color: #a6c8ff; /* Light blue background for headers */
+    color: #2c3e50; /* Darker text for headers */
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.expense-row {
+    display: contents; /* Ensure rows align with the grid */
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.expense-cell {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd; /* Row separator */
+    font-size: 14px;
+}
+
+/* Actions Buttons */
+.expense-actions button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.expense-actions button:hover {
+    background-color: #ff3b30;
+}
