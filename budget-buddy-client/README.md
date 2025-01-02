@@ -53,20 +53,16 @@ Ensure you have the following installed:
    ```
 
 2. Set up the backend:
-   ```bash
+   ```
+   cd budget-buddy-client
    cd server
-   pipenv install
-   pipenv shell
-   flask db init
-   flask db migrate -m "Initial migration."
-   flask db upgrade
+   source venv/bin/activate
    python app.py
    ```
 
 3. Set up the frontend:
    ```bash
-   cd client
-   npm install
+   cd server
    npm start
    ```
 
@@ -128,6 +124,6 @@ Ensure you have the following installed:
 ---
 
 ## Contributors
-- Karina 
-- Namima
+- Namima 
 - Ron
+- Karina

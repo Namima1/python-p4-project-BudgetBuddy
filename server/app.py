@@ -35,12 +35,15 @@ def register():
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
+    print(f"Received login data: {data}")  # Debugging
     username = data.get("username")
     password = data.get("password")
 
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
+        print("Login successful!")  # Debugging
         return jsonify({"message": "Login successful!"}), 200
+    print("Invalid username or password")  # Debugging
     return jsonify({"message": "Invalid username or password"}), 401
 
 @app.route("/expenses", methods=["GET", "POST"])
