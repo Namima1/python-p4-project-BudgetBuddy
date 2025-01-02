@@ -36,6 +36,10 @@ function Dashboard() {
             setError("All fields are required.");
             return;
         }
+        if (parseFloat(expenseToValidate.amount) <= 0) { // Ensure amount is more than 0
+            setError("Amount must be greater than 0.");
+            return;
+        }
     
         const username = localStorage.getItem("username"); // Get the logged-in user's username
         const url = editingExpense
