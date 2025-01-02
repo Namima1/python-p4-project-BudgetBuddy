@@ -211,7 +211,7 @@ function Dashboard() {
             <div className="expense-cell">${parseFloat(expense.amount).toFixed(2)}</div>
             <div className="expense-cell">{new Date(expense.date).toLocaleDateString()}</div>
             <div className="expense-cell expense-actions">
-                {/* <button onClick={() => handleDeleteExpense(expense.id)}>Delete</button> */}
+                <button onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
                 <button onClick={() => setEditingExpense(expense)}>Update</button>
             </div>
         </div>
